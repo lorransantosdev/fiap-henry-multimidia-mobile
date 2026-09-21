@@ -12,10 +12,7 @@ export function DealershipOverlay() {
 
   useEffect(() => {
     const t = setTimeout(
-      () =>
-        speak(
-          'Onde você prefere cuidar do seu Ford? Recomendo a Ford Center São Paulo, a mais próxima. Posso seguir com ela?'
-        ),
+      () => speak('Onde prefere agendar? Recomendo a Ford Center São Paulo. Pode ser?'),
       400
     )
     return () => clearTimeout(t)

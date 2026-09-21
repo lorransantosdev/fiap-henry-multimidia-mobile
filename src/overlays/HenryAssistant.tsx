@@ -46,7 +46,7 @@ export function HenryAssistant() {
     if (!henryOpen) return
     const line = hasRecommendation
       ? `Olá Pedro. ${scenario.voiceLine}`
-      : `Olá Pedro. Estou monitorando o seu Ford de forma contínua e, no momento, está tudo dentro do esperado.`
+      : `Olá Pedro. Estou monitorando o seu Ford. Está tudo certo.`
     const t = setTimeout(() => speak(line), 300)
     return () => clearTimeout(t)
   }, [henryOpen, hasRecommendation, scenario])

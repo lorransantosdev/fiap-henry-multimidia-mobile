@@ -68,7 +68,7 @@ export const scenarios: Record<string, Scenario> = {
     voiceLine:
       'Identifiquei um sinal no sistema de frenagem. Quer que eu explique?',
     spoken:
-      'Pedro, identifiquei sinais de desgaste no sistema de frenagem acima do esperado, com 78 por cento de probabilidade. Não é uma falha imediata, mas recomendo agendar uma inspeção preventiva. Se você quiser, eu já cuido do agendamento na rede Ford.',
+      'Pedro, notei desgaste no freio, com 78% de probabilidade. Recomendo uma inspeção preventiva.',
     sharedData: [
       'Sintomas identificados',
       'Health Score',
@@ -103,7 +103,7 @@ export const scenarios: Record<string, Scenario> = {
     voiceLine:
       'Identifiquei sinais de degradação na bateria. Quer que eu explique?',
     spoken:
-      'Pedro, notei sinais de degradação na bateria, com 84 por cento de probabilidade. O veículo continua funcionando, mas recomendo uma verificação com prioridade para evitar uma pane inesperada. Posso agendar isso para você na rede Ford.',
+      'Pedro, a bateria está com sinais de desgaste, 84% de probabilidade. Recomendo verificar com prioridade.',
     sharedData: [
       'Sintomas identificados',
       'Health Score',
@@ -138,7 +138,7 @@ export const scenarios: Record<string, Scenario> = {
     voiceLine:
       'Identifiquei variações na condição dos pneus. Quer que eu explique?',
     spoken:
-      'Pedro, encontrei variações na condição dos pneus, com 66 por cento de probabilidade. Não há risco imediato, mas recomendo uma inspeção preventiva para preservar a segurança e o consumo. Quer que eu agende para você?',
+      'Pedro, notei variação nos pneus, 66% de probabilidade. Recomendo uma inspeção preventiva.',
     sharedData: [
       'Sintomas identificados',
       'Health Score',
@@ -172,7 +172,7 @@ export const scenarios: Record<string, Scenario> = {
     voiceLine:
       'Verifiquei os sistemas do seu veículo e está tudo dentro do esperado.',
     spoken:
-      'Pedro, verifiquei os principais sistemas do seu Ford e está tudo dentro do esperado. Pode dirigir tranquilo. Continuo monitorando e aviso você se algo mudar.',
+      'Pedro, verifiquei seu Ford e está tudo certo. Sigo monitorando.',
     sharedData: [],
     accent: '#16A34A',
   },

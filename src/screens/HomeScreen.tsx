@@ -6,6 +6,8 @@ import {
   ChevronRight,
   AlertTriangle,
   Activity,
+  ShieldCheck,
+  ShieldAlert,
 } from 'lucide-react'
 import { useApp } from '../store'
 import { driver, vehicle } from '../data/vehicle'
@@ -19,8 +21,16 @@ const quickCards = [
 ] as const
 
 export function HomeScreen() {
-  const { setTab, currentScore, hasRecommendation, openAlert, setDemoOpen, scenario } =
-    useApp()
+  const {
+    setTab,
+    currentScore,
+    hasRecommendation,
+    openAlert,
+    setDemoOpen,
+    scenario,
+    sealActive,
+    officialPct,
+  } = useApp()
 
   return (
     <div className="scroll-area grid h-full grid-cols-1 gap-5 overflow-y-auto md:grid-cols-[1.4fr_1fr]">
@@ -114,6 +124,21 @@ export function HomeScreen() {
         >
           {hasRecommendation ? 'Inspeção recomendada' : 'Monitoramento ativo'}
         </div>
+
+        {/* official-maintenance seal chip */}
+        <button
+          onClick={() => setTab('vehicle')}
+          className={cx(
+            'press flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-semibold',
+            sealActive
+              ? 'border-status-blue/40 bg-status-blue/12 text-ford-periwinkle'
+              : 'border-amber-400/40 bg-amber-500/10 text-amber-200'
+          )}
+        >
+          {sealActive ? <ShieldCheck size={15} /> : <ShieldAlert size={15} />}
+          {sealActive ? 'Selo Oficial · 100%' : `Selo interrompido · ${officialPct}%`}
+        </button>
+
         <Button block variant="secondary" size="md" onClick={() => setTab('vehicle')}>
           <Car size={20} />
           Ver saúde do veículo

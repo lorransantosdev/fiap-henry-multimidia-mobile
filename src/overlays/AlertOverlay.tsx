@@ -7,6 +7,8 @@ import {
   Gauge,
   Lightbulb,
   ShieldAlert,
+  ShieldCheck,
+  TrendingUp,
   Volume2,
   RotateCcw,
 } from 'lucide-react'
@@ -16,6 +18,7 @@ import { HenryOrb } from '../components/HenryOrb'
 import { Button, HealthRing, PriorityPill, cx } from '../components/ui'
 import { VoiceReply } from '../components/VoiceReply'
 import { RX_AFFIRMATIVE, RX_NEGATIVE, RX_SCHEDULE } from './HenryNotice'
+import { formatBRL } from '../data/maintenance'
 import { speak } from '../voice'
 
 function SpeakingDots() {
@@ -57,7 +60,15 @@ function ProbabilityBar({ value, accent }: { value: number; accent: string }) {
 }
 
 export function AlertOverlay() {
-  const { scenario, setFlowStep, dismissAlert, speaking, voiceEnabled } = useApp()
+  const {
+    scenario,
+    setFlowStep,
+    dismissAlert,
+    speaking,
+    voiceEnabled,
+    potentialLoss,
+    permanentPenalty,
+  } = useApp()
   const [showDetails, setShowDetails] = useState(false)
 
   // Henry proactively speaks the recommendation the moment the alert appears.
@@ -142,6 +153,28 @@ export function AlertOverlay() {
               </div>
               <ProbabilityBar value={scenario.probability} accent={scenario.accent} />
             </div>
+
+            {/* resale benefit — prominent, always visible (gain framing) */}
+            <div className="rounded-3xl border-2 border-status-blue/40 bg-status-blue/[0.12] p-5">
+              <div className="mb-1.5 flex items-center gap-2 text-ford-periwinkle">
+                <TrendingUp size={20} />
+                <span className="text-sm font-bold uppercase tracking-wide">
+                  Agendando na Ford
+                </span>
+              </div>
+              <div className="text-4xl font-extrabold leading-none text-ford-periwinkle">
+                +{formatBRL(potentialLoss)}
+              </div>
+              <p className="mt-2 text-sm leading-snug text-white/75">
+                você mantém o <span className="font-semibold text-white">Selo de Manutenção
+                Oficial</span> e evita {formatBRL(permanentPenalty)} de perda permanente por
+                reparo fora da rede.
+              </p>
+              <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-emerald-500/12 px-3 py-2 text-xs font-semibold text-emerald-300">
+                <ShieldCheck size={14} />
+                Diagnóstico já enviado + histórico oficial completo.
+              </div>
+            </div>
           </div>
 
           {/* RIGHT — meaning + recommendation */}
@@ -217,15 +250,21 @@ export function AlertOverlay() {
         </div>
 
         {/* CTAs */}
-        <div className="sticky bottom-0 flex flex-col gap-3 border-t border-white/10 bg-[#04093a]/70 px-6 py-5 backdrop-blur-xl sm:flex-row sm:items-center sm:px-8">
-          <VoiceReply intents={intents} className="sm:mr-auto" />
-          <Button className="flex-1 sm:flex-none" onClick={() => setFlowStep('dealership')}>
-            <Calendar size={22} />
-            Agendar serviço Ford
-          </Button>
-          <Button variant="secondary" onClick={dismissAlert}>
-            Agora não
-          </Button>
+        <div className="sticky bottom-0 flex flex-col gap-3 border-t border-white/10 bg-[#04093a]/70 px-6 py-4 backdrop-blur-xl sm:px-8">
+          <div className="flex items-center justify-center gap-2 rounded-2xl bg-status-blue/12 px-4 py-2 text-center text-sm font-semibold text-ford-periwinkle">
+            <TrendingUp size={16} />
+            Agende na Ford: Selo Oficial + até {formatBRL(potentialLoss)} de revenda
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <VoiceReply intents={intents} className="sm:mr-auto" />
+            <Button className="flex-1 sm:flex-none" onClick={() => setFlowStep('dealership')}>
+              <Calendar size={22} />
+              Agendar serviço Ford
+            </Button>
+            <Button variant="secondary" onClick={dismissAlert}>
+              Agora não
+            </Button>
+          </div>
         </div>
       </div>
     </Overlay>

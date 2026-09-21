@@ -67,9 +67,22 @@ function Connector({ active }: { active: boolean }) {
 }
 
 export function ConfirmationOverlay() {
-  const { scenario, booking, resetDemo, setFlowStep, setTab, speaking } = useApp()
+  const {
+    scenario,
+    booking,
+    resetDemo,
+    setFlowStep,
+    setTab,
+    speaking,
+    addOfficialMaintenance,
+  } = useApp()
   const dealership = dealerships.find((d) => d.id === booking.dealershipId)
   const [stage, setStage] = useState(0) // 0..3 nodes, 4 = report revealed
+
+  // Record this service inside the official network → keeps the seal.
+  useEffect(() => {
+    addOfficialMaintenance()
+  }, [addOfficialMaintenance])
 
   useEffect(() => {
     const timers = [
@@ -79,9 +92,7 @@ export function ConfirmationOverlay() {
       setTimeout(() => setStage(4), 2500),
       setTimeout(
         () =>
-          speak(
-            'Pronto, Pedro. Agendei o serviço e já enviei o diagnóstico completo para a concessionária. Você não precisa explicar nada quando chegar.'
-          ),
+          speak('Pronto, Pedro. Agendei e enviei o diagnóstico para a concessionária.'),
         900
       ),
     ]

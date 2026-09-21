@@ -67,7 +67,7 @@ export function speak(text: string) {
     s.cancel()
     const u = new SpeechSynthesisUtterance(text)
     u.lang = 'pt-BR'
-    u.rate = 1.03
+    u.rate = 1.15
     u.pitch = 1.0
     u.volume = 1
     const v = pickVoice()

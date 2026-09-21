@@ -33,7 +33,7 @@ export function HenryNotice() {
   useEffect(() => {
     if (!henryNotice) return
     const line = hasRecommendation
-      ? `Pedro, percebi um sinal no ${scenario.system.toLowerCase()} do seu veículo. Quer que eu te explique?`
+      ? `Pedro, percebi um sinal no ${scenario.system.toLowerCase()}. Quer que eu explique?`
       : scenario.spoken
     const t = setTimeout(() => speak(line), 400)
     return () => clearTimeout(t)

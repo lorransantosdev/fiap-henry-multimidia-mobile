@@ -1,4 +1,4 @@
-import { SlidersHorizontal, X, Play, RotateCcw } from 'lucide-react'
+import { SlidersHorizontal, X, Play, RotateCcw, Wrench } from 'lucide-react'
 import { useApp } from '../store'
 import { scenarioOrder, scenarios } from '../data/scenarios'
 import { cx } from './ui'
@@ -18,7 +18,15 @@ export function DemoLauncher() {
 }
 
 export function DemoPanel() {
-  const { demoOpen, setDemoOpen, runScenario, resetDemo, scenarioId, resultReady } = useApp()
+  const {
+    demoOpen,
+    setDemoOpen,
+    runScenario,
+    resetDemo,
+    scenarioId,
+    resultReady,
+    simulateOffNetwork,
+  } = useApp()
   if (!demoOpen) return null
 
   return (
@@ -73,6 +81,26 @@ export function DemoPanel() {
                 </button>
               )
             })}
+          </div>
+
+          {/* Off-network repair (seal) */}
+          <div className="mt-4 border-t border-white/8 pt-4">
+            <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300/80">
+              Selo de manutenção
+            </span>
+            <button
+              onClick={simulateOffNetwork}
+              className="press flex w-full items-center gap-3 rounded-2xl border border-amber-400/30 bg-amber-500/8 p-3 text-left transition-all hover:border-amber-400/50"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-amber-500/20">
+                <Wrench size={20} className="text-amber-300" />
+              </span>
+              <div className="flex-1">
+                <div className="text-sm font-bold">Reparo fora da rede</div>
+                <div className="text-xs text-white/45">Detecta melhora sem passar na Ford</div>
+              </div>
+              <Play size={16} className="text-white/40" />
+            </button>
           </div>
 
           <button

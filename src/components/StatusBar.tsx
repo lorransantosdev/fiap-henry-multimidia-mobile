@@ -7,12 +7,21 @@ import { cx } from './ui'
 export function StatusBar() {
   const { voiceEnabled, toggleVoice, speaking } = useApp()
 
-  // Live clock — always the device's current time.
+  // Live clock — always the device's current time. Updates once per minute
+  // (aligned to the minute boundary) to avoid unnecessary per-second repaints.
   const [now, setNow] = useState(() => new Date())
 
   useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 1000)
-    return () => clearInterval(t)
+    let interval: ReturnType<typeof setInterval>
+    const msToNextMinute = 60000 - (Date.now() % 60000)
+    const timeout = setTimeout(() => {
+      setNow(new Date())
+      interval = setInterval(() => setNow(new Date()), 60000)
+    }, msToNextMinute)
+    return () => {
+      clearTimeout(timeout)
+      if (interval) clearInterval(interval)
+    }
   }, [])
 
   const hh = now.getHours().toString().padStart(2, '0')

@@ -34,6 +34,7 @@ export function HenryOrb({
             height: size,
             border: `1.5px solid ${ring}`,
             animation: `pulse-ring ${speaking ? '1.4s' : '2.4s'} cubic-bezier(0.4,0,0.6,1) infinite`,
+            willChange: 'transform, opacity',
           }}
         />
       )}
@@ -46,6 +47,7 @@ export function HenryOrb({
             border: `1.5px solid ${ring}`,
             animation: 'pulse-ring 1.4s cubic-bezier(0.4,0,0.6,1) infinite',
             animationDelay: '0.7s',
+            willChange: 'transform, opacity',
           }}
         />
       )}
@@ -55,6 +57,7 @@ export function HenryOrb({
         style={{
           width: size * 0.82,
           height: size * 0.82,
+          willChange: speaking ? 'transform' : undefined,
           background:
             'radial-gradient(circle at 50% 40%, rgba(10,23,110,0.9), rgba(4,9,58,0.95))',
           border: `1px solid ${ring}`,

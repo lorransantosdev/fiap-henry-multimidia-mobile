@@ -32,6 +32,10 @@ body {
 .scroll-area {
   scrollbar-width: thin;
   scrollbar-color: rgba(137, 159, 254, 0.35) transparent;
+  /* never show a horizontal bar, and always reserve the vertical gutter so it
+     can't flicker on/off as content height crosses the boundary */
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
 }
 .scroll-area::-webkit-scrollbar {
   width: 6px;

@@ -8,7 +8,12 @@ import {
   type ReactNode,
 } from 'react'
 import { scenarios, type Scenario } from './data/scenarios'
-import { baseSubsystems, type Subsystem } from './data/vehicle'
+import { baseSubsystems, dealerships, type Subsystem } from './data/vehicle'
+import {
+  resaleConfig,
+  seedMaintenance,
+  type MaintenanceRecord,
+} from './data/maintenance'
 import {
   cancel as cancelVoice,
   initVoices,
@@ -69,6 +74,32 @@ interface AppState {
   voiceEnabled: boolean
   toggleVoice: () => void
 
+  // --- Maintenance seal / resale value ---
+  maintenance: MaintenanceRecord[]
+  /** true while 100% of maintenance is inside the official Ford network */
+  sealActive: boolean
+  officialCount: number
+  offCount: number
+  /** % of maintenance done in the official network */
+  officialPct: number
+  /** current estimated resale value (R$) */
+  resaleValue: number
+  /** resale value with the seal kept (ideal) */
+  resaleWithSeal: number
+  /** the recoverable seal premium (R$) */
+  potentialLoss: number
+  /** amount you can win back by reactivating the seal (R$) */
+  recoverable: number
+  /** total permanent (unrecoverable) loss so far (R$) */
+  permanentLoss: number
+  /** permanent loss applied per off-network service (R$) */
+  permanentPenalty: number
+  /** the off-network detection overlay is visible */
+  offNetworkOpen: boolean
+  simulateOffNetwork: () => void
+  closeOffNetwork: () => void
+  addOfficialMaintenance: () => void
+
   /** start the simulate → analyze → result flow for a scenario */
   runScenario: (id: string) => void
   /** open the alert detail again (from home / henry) */
@@ -96,6 +127,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [henryNotice, setHenryNotice] = useState(false)
   const [speaking, setSpeaking] = useState(false)
   const [voiceEnabled, setVoiceEnabledState] = useState(isVoiceEnabled())
+  const [maintenance, setMaintenance] = useState<MaintenanceRecord[]>(seedMaintenance)
+  const [scoreOverride, setScoreOverride] = useState<number | null>(null)
+  const [offNetworkOpen, setOffNetworkOpen] = useState(false)
 
   const scenario = scenarios[scenarioId]
 
@@ -156,22 +190,108 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setDemoOpen(false)
     setHenryOpen(false)
     setHenryNotice(false)
+    setMaintenance(seedMaintenance)
+    setScoreOverride(null)
+    setOffNetworkOpen(false)
     setTab('home')
   }, [])
 
   const currentScore = useMemo(() => {
+    if (scoreOverride !== null) return scoreOverride
     if (!resultReady) return scenario.baselineScore
     return scenario.newScore
-  }, [resultReady, scenario])
+  }, [scoreOverride, resultReady, scenario])
 
   const subsystems = useMemo<Subsystem[]>(() => {
-    if (!resultReady || scenario.healthy) return baseSubsystems
+    if (scoreOverride !== null || !resultReady || scenario.healthy) return baseSubsystems
     return baseSubsystems.map((s) =>
       s.label === scenario.affectedSubsystem
         ? { ...s, value: scenario.severity === 'critical' ? 58 : 72 }
         : s
     )
-  }, [resultReady, scenario])
+  }, [scoreOverride, resultReady, scenario])
+
+  // --- Maintenance seal & resale value (derived) ---
+  // The seal is RECOVERABLE and never punitive: it reflects your current
+  // trajectory (is the most recent service in the network?), not a permanent
+  // mark. A service outside the network simply pauses it until the next
+  // official one reactivates it. Resale value follows the same logic — no
+  // permanent penalty, only the seal premium that you keep or win back.
+  const offCount = maintenance.filter((m) => m.network === 'off').length
+  const officialCount = maintenance.length - offCount
+  const sealActive = maintenance.length ? maintenance[0].network !== 'off' : true
+  const officialPct = maintenance.length
+    ? Math.round((officialCount / maintenance.length) * 100)
+    : 100
+  // Permanent loss: each off-network service leaves a small mark that never
+  // returns. The seal premium, on the other hand, is fully recoverable.
+  const permanentLoss = offCount * resaleConfig.offPenalty
+  const resaleValue =
+    resaleConfig.base + (sealActive ? resaleConfig.sealPremium : 0) - permanentLoss
+  const resaleWithSeal = resaleConfig.base + resaleConfig.sealPremium
+  /** amount you can win back by reactivating the seal (0 when already active) */
+  const recoverable = sealActive ? 0 : resaleConfig.sealPremium
+  /** the recoverable seal premium (shown as the gain of staying in-network) */
+  const potentialLoss = resaleConfig.sealPremium
+  /** permanent loss applied per off-network service */
+  const permanentPenalty = resaleConfig.offPenalty
+
+  // Demo: the car detected a health recovery with no dealership record →
+  // register a maintenance done OUTSIDE the official network (breaks the seal).
+  const simulateOffNetwork = useCallback(() => {
+    cancelVoice()
+    const sc = scenarios[scenarioId]
+    const system = sc.healthy ? 'Freios' : sc.system
+    const before = scoreOverride ?? (resultReady ? sc.newScore : 74)
+    setMaintenance((prev) => [
+      {
+        id: 'off-' + Date.now(),
+        date: '21 SET 2026',
+        label: `Reparo — ${system}`,
+        system,
+        network: 'off',
+        dealership: 'Oficina externa',
+        scoreBefore: before,
+        scoreAfter: 91,
+      },
+      ...prev,
+    ])
+    setScoreOverride(91)
+    setHasRecommendation(false)
+    setResultReady(true)
+    setDemoOpen(false)
+    setHenryNotice(false)
+    setFlowStep('idle')
+    setOffNetworkOpen(true)
+  }, [scenarioId, scoreOverride, resultReady])
+
+  const closeOffNetwork = useCallback(() => {
+    cancelVoice()
+    setOffNetworkOpen(false)
+  }, [])
+
+  // Official service completed → record it inside the network (keeps the seal).
+  const addOfficialMaintenance = useCallback(() => {
+    const sc = scenarios[scenarioId]
+    if (sc.healthy) return
+    const dealer = dealerships.find((d) => d.id === booking.dealershipId)
+    setMaintenance((prev) => {
+      if (prev.some((r) => r.id === 'official-current')) return prev
+      return [
+        {
+          id: 'official-current',
+          date: '21 SET 2026',
+          label: `Inspeção — ${sc.system}`,
+          system: sc.system,
+          network: 'official',
+          dealership: dealer?.name ?? 'Rede Ford',
+          scoreBefore: sc.newScore,
+          scoreAfter: 93,
+        },
+        ...prev,
+      ]
+    })
+  }, [scenarioId, booking.dealershipId])
 
   const value: AppState = {
     tab,
@@ -195,6 +315,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     speaking,
     voiceEnabled,
     toggleVoice,
+    maintenance,
+    sealActive,
+    officialCount,
+    offCount,
+    officialPct,
+    resaleValue,
+    resaleWithSeal,
+    potentialLoss,
+    recoverable,
+    permanentLoss,
+    permanentPenalty,
+    offNetworkOpen,
+    simulateOffNetwork,
+    closeOffNetwork,
+    addOfficialMaintenance,
     runScenario,
     openAlert,
     resetDemo,

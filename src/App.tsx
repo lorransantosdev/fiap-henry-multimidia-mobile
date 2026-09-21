@@ -13,6 +13,7 @@ import { SchedulingOverlay } from './overlays/SchedulingOverlay'
 import { ConfirmationOverlay } from './overlays/ConfirmationOverlay'
 import { HenryAssistant } from './overlays/HenryAssistant'
 import { HenryNotice } from './overlays/HenryNotice'
+import { OffNetworkOverlay } from './overlays/OffNetworkOverlay'
 
 function Screens() {
   const { tab } = useApp()
@@ -66,6 +67,7 @@ function Shell() {
       {/* Proactive notification, flows & assistant */}
       <HenryNotice />
       <FlowManager />
+      <OffNetworkOverlay />
       <HenryAssistant />
 
       {/* Portrait hint */}

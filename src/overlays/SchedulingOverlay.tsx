@@ -53,10 +53,7 @@ export function SchedulingOverlay() {
   // Henry proactively asks for the day and time.
   useEffect(() => {
     const t = setTimeout(
-      () =>
-        speak(
-          'Para quando você quer agendar? Você pode falar o dia e o horário, por exemplo: amanhã às nove e quarenta.'
-        ),
+      () => speak('Para quando quer agendar? Diga o dia e o horário.'),
       400
     )
     return () => clearTimeout(t)
@@ -70,18 +67,18 @@ export function SchedulingOverlay() {
     if (p.time) setBooking({ time: p.time })
 
     if (p.confirm && nextDay && nextTime) {
-      speak('Perfeito. Confirmando o seu agendamento.')
+      speak('Perfeito. Confirmando.')
       setTimeout(() => setFlowStep('confirmation'), 200)
       return
     }
     if (nextDay && nextTime) {
-      speak(`Perfeito: ${daySpoken[nextDay]} às ${nextTime}. Quer que eu confirme?`)
+      speak(`${daySpoken[nextDay]} às ${nextTime}. Confirmo?`)
     } else if (nextDay) {
-      speak('Certo. E qual horário fica melhor pra você?')
+      speak('E qual horário?')
     } else if (nextTime) {
-      speak('Anotei o horário. Para qual dia?')
+      speak('Para qual dia?')
     } else {
-      speak('Não entendi. Pode dizer, por exemplo: amanhã às nove e quarenta.')
+      speak('Não entendi. Diga, por exemplo: amanhã às nove e quarenta.')
     }
   }
 

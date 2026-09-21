@@ -58,6 +58,13 @@ O painel é uma ferramenta para apresentadores — não faz parte da experiênci
 - **Marca Henry** — a logo (mark de DNA + wordmark) integrada à barra do sistema, ao assistente
   e à navegação. Assets em `public/henry-lockup.png` e `public/henry-mark.png`.
 - **Health Score** — indicadores por sistema, evolução de 30 dias e histórico do veículo.
+- **Selo de Manutenção Oficial** — veículo com 100% da manutenção na rede Ford ganha um selo
+  visível na multimídia (chip na Home + medalhão na tela Veículo). O sistema detecta quando o
+  Health Score melhora **sem** registro na rede (reparo em oficina externa), registra a
+  manutenção como **fora da rede** e interrompe o selo. Mostra o **valor de revenda estimado** e
+  **quanto o motorista perde** ao reparar fora da rede. Histórico de manutenção consultável, com
+  cada serviço marcado como *Rede oficial* ou *Fora da rede*.
+  - Demo: no painel, seção **Selo de manutenção → "Reparo fora da rede"**.
 
 > A voz usa o mecanismo de síntese do navegador. Após qualquer toque na tela (ex.: iniciar a
 > demo), o áudio é liberado — comportamento padrão dos navegadores.

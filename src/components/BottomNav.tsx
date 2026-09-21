@@ -52,7 +52,12 @@ export function BottomNav() {
             : 'hover:bg-white/5'
         )}
       >
-        <HenryOrb size={44} alert={hasRecommendation} active speaking={speaking} />
+        <HenryOrb
+          size={44}
+          alert={hasRecommendation}
+          active={hasRecommendation}
+          speaking={speaking}
+        />
         <span className="hidden text-left sm:block">
           <span className="block text-sm font-bold leading-tight">Henry</span>
           <span
