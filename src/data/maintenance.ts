@@ -11,18 +11,12 @@ export interface MaintenanceRecord {
   scoreAfter?: number
 }
 
-/**
- * Resale-value model (mocked). A vehicle with 100% of its maintenance inside
- * the official Ford network keeps a seal that adds a resale premium. Each
- * service done outside the network removes the seal and applies a penalty.
- */
 export const resaleConfig = {
-  base: 232000, // valor de revenda base estimado (R$)
-  sealPremium: 14200, // prêmio do selo — RECUPERÁVEL (o selo pode voltar) (R$)
-  offPenalty: 4200, // perda PERMANENTE por cada manutenção fora da rede (R$)
+  base: 232000,
+  sealPremium: 14200,
+  offPenalty: 4200,
 }
 
-/** Seeded history — all official, so the seal starts valid. */
 export const seedMaintenance: MaintenanceRecord[] = [
   {
     id: 'm-oil',
@@ -51,9 +45,13 @@ export const seedMaintenance: MaintenanceRecord[] = [
 ]
 
 export function formatBRL(v: number): string {
-  return v.toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-    maximumFractionDigits: 0,
-  })
+  try {
+    return v.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      maximumFractionDigits: 0,
+    })
+  } catch {
+    return `R$ ${Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
+  }
 }

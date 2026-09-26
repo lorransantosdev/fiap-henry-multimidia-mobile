@@ -1,89 +1,114 @@
-# Henry Multimedia
+# Henry Ford — App Mobile
 
-Protótipo de **central multimídia automotiva Ford** com a inteligência embarcada **Henry**.
-Simula a experiência que o motorista teria quando o Henry detecta uma possível anomalia no
-veículo — do alerta preventivo ao agendamento na rede Ford, com o diagnóstico enviado
-automaticamente para a concessionária.
+App do **Henry**, assistente de manutenção preventiva para veículos Ford. O Henry identifica
+sinais de desgaste no carro, explica o que está acontecendo, recomenda o serviço e já agenda na
+rede oficial Ford, enviando o diagnóstico para a concessionária.
 
-> ⚠️ **Protótipo de apresentação.** Não há integração real com o veículo. Todos os dados são
-> fictícios/mockados. Otimizado para **Samsung Galaxy Tab S10 em modo paisagem (landscape)**.
+Challenge FIAP + Ford — Mobile Development and IoT (Sprint 3).
 
-## Como executar
+> Os dados do veículo, das concessionárias e o login são simulados. Tudo fica salvo no próprio
+> aparelho com AsyncStorage.
+
+## Rodando o projeto
+
+Precisa de Node.js 20+ e do app **Expo Go** no celular.
 
 ```bash
 npm install
-npm run dev
+npx expo start
 ```
 
-Abra o endereço exibido (ex.: `http://localhost:5173`). Para produção: `npm run build` + `npm run preview`.
+Escaneie o QR code com o Expo Go (Android) ou com a câmera (iPhone). Também dá para abrir no
+emulador Android apertando `a` no terminal.
 
-## Jornada principal da demo
+Login de teste: **pedro@ford.com / henry123** (ou o botão "Usar conta de demonstração").
 
-O Henry é **proativo**: ao iniciar um cenário, ele não roda um scan — já "sabe" que há algo e
-surge uma **notificação** perguntando se o motorista quer entender o problema.
+## Gerando o APK
 
-`Home → Simular evento → Notificação do Henry ("percebi um sinal, quer que eu explique?") →
-Sim, explicar → Alerta + Recomendação (com voz) → Agendar serviço Ford → Escolher concessionária
-→ Escolher horário → Confirmar → Diagnóstico enviado à concessionária`
+O APK é gerado pelo EAS Build (na nuvem da Expo), não precisa de Android Studio.
 
-## Modo Apresentação
+```bash
+npx eas-cli@latest login
+npx eas-cli@latest init
+npx eas-cli@latest build -p android --profile preview
+```
 
-No canto superior direito há o botão **Demo** (ou **Simular evento** na Home). Ele abre o painel
-de apresentação com 4 cenários controláveis:
+Quando terminar, o EAS mostra um link e um QR code para baixar o `.apk`. É só abrir no celular e
+instalar (o Android pode pedir para liberar a instalação de fontes desconhecidas).
 
-| Cenário        | Health Score | Prioridade |
-|----------------|:------------:|:----------:|
-| Freios         | 72           | Média      |
-| Bateria        | 61           | Alta       |
-| Pneus          | 79           | Média      |
-| Saúde normal   | 94           | —          |
+O perfil `preview` do `eas.json` gera `.apk`. O perfil `production` gera `.aab` para a Play Store.
 
-O painel é uma ferramenta para apresentadores — não faz parte da experiência normal do motorista.
+## Testes
 
-## Destaques da experiência
+```bash
+npm test
+```
 
-- **Henry proativo e com voz (nos dois sentidos)** — ao detectar uma anomalia, o Henry **fala a
-  recomendação em voz alta (pt-BR, Web Speech API)** e traz o alerta até o motorista. E o
-  motorista **responde por voz**: um microfone (reconhecimento de fala pt-BR) aparece na
-  notificação, no alerta e no assistente. Basta dizer **"Sim" / "Explicar" / "Agendar" /
-  "Agora não"** — hands-free: o mic abre sozinho assim que o Henry termina a pergunta.
-  O ícone de som na barra superior liga/desliga a voz do Henry (útil na apresentação).
-  > O reconhecimento de fala precisa de permissão de microfone e roda no Chrome/Edge (e no
-  > Chrome do Tab S10). Em navegadores sem suporte, o mic simplesmente não aparece e os botões
-  > continuam funcionando.
-- **Linguagem preventiva e probabilística** — o Henry avisa sem assustar.
-- **Do alerta à ação** — o Henry não apenas detecta; ele explica, recomenda e agenda.
-- **Integração ponta a ponta** — animação `Veículo → Henry → Concessionária` mostrando o
-  diagnóstico compartilhado. *"Você não precisa explicar o problema."*
-- **Marca Henry** — a logo (mark de DNA + wordmark) integrada à barra do sistema, ao assistente
-  e à navegação. Assets em `public/henry-lockup.png` e `public/henry-mark.png`.
-- **Health Score** — indicadores por sistema, evolução de 30 dias e histórico do veículo.
-- **Selo de Manutenção Oficial** — veículo com 100% da manutenção na rede Ford ganha um selo
-  visível na multimídia (chip na Home + medalhão na tela Veículo). O sistema detecta quando o
-  Health Score melhora **sem** registro na rede (reparo em oficina externa), registra a
-  manutenção como **fora da rede** e interrompe o selo. Mostra o **valor de revenda estimado** e
-  **quanto o motorista perde** ao reparar fora da rede. Histórico de manutenção consultável, com
-  cada serviço marcado como *Rede oficial* ou *Fora da rede*.
-  - Demo: no painel, seção **Selo de manutenção → "Reparo fora da rede"**.
+Os testes usam Jest com o preset `jest-expo/android` e o `renderRouter` do Expo Router, então
+renderizam as telas reais e navegam entre elas como o usuário faria:
 
-> A voz usa o mecanismo de síntese do navegador. Após qualquer toque na tela (ex.: iniciar a
-> demo), o áudio é liberado — comportamento padrão dos navegadores.
+- login: validação dos campos, senha errada, login, sessão salva e logout;
+- Henry: notificação proativa com voz, alerta, agendamento completo na rede Ford;
+- agendamentos: criar, reagendar, cancelar, excluir e concluir;
+- selo de manutenção: registro fora da rede pausa o selo, registro oficial reativa, valor de revenda;
+- abas, cenário de saúde normal e assistente por texto/voz.
 
-## PWA (instalável + offline)
+Também tem `npm run lint` e `npm run typecheck`.
 
-O app é um **Progressive Web App** — pode ser instalado na tela inicial do tablet e funciona
-offline após a primeira abertura.
+## Telas
 
-- Manifesto `standalone`, orientação `landscape`, tema navy, ícones (incl. `maskable`).
-- Service worker (Workbox via `vite-plugin-pwa`) faz precache do app shell e cache das fontes.
-- Para instalar no **Galaxy Tab S10**: abra no Chrome → menu → **Instalar app / Adicionar à tela
-  inicial**. O ícone do Henry aparece como um app nativo, em tela cheia e landscape.
+| | | | |
+|:-:|:-:|:-:|:-:|
+| ![Login](docs/screenshots/01-login.png) | ![Início](docs/screenshots/02-inicio.png) | ![Henry](docs/screenshots/04-notificacao-henry.png) | ![Alerta](docs/screenshots/05-alerta.png) |
+| Login | Início | Aviso do Henry | Alerta |
+| ![Concessionária](docs/screenshots/06-concessionaria.png) | ![Horário](docs/screenshots/07-data-horario.png) | ![Confirmação](docs/screenshots/08-confirmacao.png) | ![Agenda](docs/screenshots/09-agenda.png) |
+| Concessionária | Data e horário | Confirmação | Agenda |
+| ![Detalhe](docs/screenshots/10-detalhe-agendamento.png) | ![Início com alerta](docs/screenshots/11-inicio-com-alerta.png) | ![Veículo](docs/screenshots/12-veiculo.png) | ![Assistente](docs/screenshots/13-assistente-henry.png) |
+| Detalhe do agendamento | Início com alerta | Veículo | Assistente |
+| ![Registrar](docs/screenshots/14-registrar-manutencao.png) | ![Fora da rede](docs/screenshots/15-fora-da-rede.png) | ![Histórico](docs/screenshots/16-historico-manutencao.png) | ![Saúde normal](docs/screenshots/17-saude-normal.png) |
+| Registrar manutenção | Fora da rede | Histórico e selo | Saúde normal |
+| ![Perfil](docs/screenshots/18-perfil.png) | ![Apresentação](docs/screenshots/03-modo-apresentacao.png) | | |
+| Perfil | Modo apresentação | | |
 
-> O service worker roda apenas no build de produção (`npm run build` + `npm run preview`) ou
-> quando publicado em HTTPS — não no `npm run dev` (proposital, para evitar cache durante o
-> desenvolvimento).
+## Como testar os fluxos
 
-## Tecnologia
+1. **Henry avisando um problema:** na Início, toque em *Simular evento* e escolha Freios, Bateria
+   ou Pneus. O Henry mostra o aviso e fala. Toque em *Sim, explicar* para ver o alerta.
+2. **Agendar na rede Ford:** no alerta, *Agendar serviço Ford* → escolha a concessionária → dia
+   e horário → confirme.
+3. **Gerenciar agendamentos:** aba Agenda → toque no agendamento → reagendar, cancelar, marcar
+   como concluído ou excluir.
+4. **Selo de manutenção:** aba Veículo → *Histórico de manutenção* → *Registrar manutenção*.
+   Se for em oficina externa o selo pausa e o valor de revenda cai; um serviço na rede Ford
+   reativa o selo.
+5. **Assistente:** aba Henry, pergunte por exemplo "Quanto vale meu carro?".
+6. **Voz:** dá para desligar a voz do Henry no Perfil ou no ícone de som da aba Henry.
 
-React · TypeScript · Vite · Tailwind CSS · lucide-react · vite-plugin-pwa (Workbox).
-Sem backend — todo o estado é local.
+No Perfil tem *Restaurar dados da demo* para voltar tudo ao estado inicial.
+
+## Estrutura
+
+```
+src/
+├── app/                 rotas (Expo Router)
+│   ├── _layout.tsx      stack principal e controle de login
+│   ├── login.tsx
+│   ├── (tabs)/          Início, Veículo, Henry, Agenda, Perfil
+│   ├── alert.tsx
+│   ├── demo.tsx
+│   ├── off-network.tsx
+│   ├── schedule/        concessionária → horário → confirmação
+│   ├── booking/[id].tsx
+│   └── maintenance/     histórico e cadastro
+├── components/          componentes visuais reutilizados
+├── data/                dados simulados (cenários, veículo, concessionárias)
+├── services/            login, armazenamento local e voz
+├── store/AppContext.tsx estado global
+└── theme.ts             cores e espaçamentos
+__tests__/               testes de integração das telas
+```
+
+## Tecnologias
+
+Expo SDK 57, React Native 0.86, TypeScript, Expo Router, AsyncStorage, expo-speech,
+expo-haptics, react-native-svg, Jest e React Native Testing Library.

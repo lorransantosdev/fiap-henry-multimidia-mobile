@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Henry Ford",
+    "slug": "henry-ford-mobile",
+    "scheme": "henryford",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#02061f",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "br.com.fiap.henryford",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "O Henry usa o microfone para ouvir suas respostas por voz."
+      }
+    },
+    "android": {
+      "package": "br.com.fiap.henryford",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#00072e"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/henry-mark.png",
+          "imageWidth": 160,
+          "resizeMode": "contain",
+          "backgroundColor": "#02061f"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

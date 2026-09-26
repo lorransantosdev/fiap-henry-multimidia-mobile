@@ -1,83 +1,61 @@
-import { cx } from './ui'
+import { useEffect, useState } from 'react'
+import { Animated, Easing, Image, View } from 'react-native'
+import { colors } from '@/theme'
 
-/**
- * Henry's avatar — the brand DNA mark inside a soft disc.
- * `active` shows a gentle pulse; `speaking` intensifies the rings while Henry talks.
- */
-export function HenryOrb({
-  size = 88,
-  active = false,
-  alert = false,
-  speaking = false,
-  className,
-}: {
-  size?: number
-  active?: boolean
-  alert?: boolean
-  speaking?: boolean
-  className?: string
-}) {
-  const ring = alert ? 'rgba(245,158,11,0.55)' : 'rgba(137,159,254,0.55)'
-  const glow = alert ? 'rgba(245,158,11,0.35)' : 'rgba(137,159,254,0.35)'
-  const showRings = active || alert || speaking
+export function HenryOrb({ size = 64, active = false }: { size?: number; active?: boolean }) {
+  const [pulse] = useState(() => new Animated.Value(0))
+
+  useEffect(() => {
+    if (!active) {
+      pulse.stopAnimation()
+      pulse.setValue(0)
+      return
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 1, duration: 700, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 0, duration: 700, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+      ])
+    )
+    loop.start()
+    return () => loop.stop()
+  }, [active, pulse])
+
+  const scale = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.25] })
+  const opacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.25, 0.6] })
 
   return (
-    <div
-      className={cx('relative grid place-items-center', className)}
-      style={{ width: size, height: size }}
-    >
-      {showRings && (
-        <span
-          className="absolute rounded-full"
-          style={{
-            width: size,
-            height: size,
-            border: `1.5px solid ${ring}`,
-            animation: `pulse-ring ${speaking ? '1.4s' : '2.4s'} cubic-bezier(0.4,0,0.6,1) infinite`,
-            willChange: 'transform, opacity',
-          }}
-        />
-      )}
-      {speaking && (
-        <span
-          className="absolute rounded-full"
-          style={{
-            width: size,
-            height: size,
-            border: `1.5px solid ${ring}`,
-            animation: 'pulse-ring 1.4s cubic-bezier(0.4,0,0.6,1) infinite',
-            animationDelay: '0.7s',
-            willChange: 'transform, opacity',
-          }}
-        />
-      )}
-      {/* disc */}
-      <div
-        className={cx('relative grid place-items-center rounded-full', speaking && 'animate-breathe')}
+    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+      <Animated.View
         style={{
-          width: size * 0.82,
-          height: size * 0.82,
-          willChange: speaking ? 'transform' : undefined,
-          background:
-            'radial-gradient(circle at 50% 40%, rgba(10,23,110,0.9), rgba(4,9,58,0.95))',
-          border: `1px solid ${ring}`,
-          boxShadow: `0 0 ${speaking ? size * 0.5 : size * 0.28}px ${glow}, inset 0 0 ${size * 0.18}px rgba(137,159,254,0.15)`,
+          position: 'absolute',
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          backgroundColor: colors.periwinkle,
+          opacity: active ? opacity : 0.15,
+          transform: [{ scale }],
+        }}
+      />
+      <View
+        style={{
+          width: size * 0.86,
+          height: size * 0.86,
+          borderRadius: size,
+          backgroundColor: colors.navy800,
+          borderWidth: 1.5,
+          borderColor: colors.periwinkle + '88',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        <img
-          src="/henry-mark.png"
-          alt="Henry"
-          draggable={false}
-          style={{
-            width: size * 0.5,
-            height: size * 0.5,
-            objectFit: 'contain',
-            filter: alert
-              ? 'drop-shadow(0 0 6px rgba(245,158,11,0.5))'
-              : 'drop-shadow(0 0 6px rgba(137,159,254,0.5))',
-          }}
+        <Image
+          source={require('../../assets/henry-mark.png')}
+          style={{ width: size * 0.6, height: size * 0.6 }}
+          resizeMode="contain"
+          accessibilityIgnoresInvertColors
         />
-      </div>
-    </div>
+      </View>
+    </View>
   )
 }

@@ -1,5 +1,7 @@
-import type { LucideIcon } from 'lucide-react'
-import { Disc3, BatteryWarning, CircleDot, ShieldCheck } from 'lucide-react'
+import type { ComponentProps } from 'react'
+import type { Ionicons } from '@expo/vector-icons'
+
+export type IconName = ComponentProps<typeof Ionicons>['name']
 
 export type Priority = 'Baixa' | 'Média' | 'Alta'
 export type Severity = 'healthy' | 'attention' | 'critical'
@@ -11,42 +13,33 @@ export interface Subsystem {
 
 export interface Scenario {
   id: string
-  /** demo panel label */
   demoLabel: string
-  icon: LucideIcon
-  /** true when the vehicle is healthy (no anomaly) */
+  icon: IconName
   healthy: boolean
   system: string
   baselineScore: number
   newScore: number
   priority: Priority
   severity: Severity
-  probability: number // 0-100
-  /** short one-line alert headline */
+  probability: number
   headline: string
-  /** neutral, preventive subtitle */
   subtitle: string
-  /** "O que isso significa?" — two paragraphs */
   meaning: string[]
   recommendation: string
   estimatedTime: string
   drivingNote: string
-  /** which subsystem gauge is affected (label match) */
   affectedSubsystem?: string
-  /** voice intro line spoken by Henry */
   voiceLine: string
-  /** the full recommendation Henry speaks proactively when the alert appears */
   spoken: string
-  /** data shared with the dealership */
   sharedData: string[]
-  accent: string // tailwind color hex for accent
+  accent: string
 }
 
 export const scenarios: Record<string, Scenario> = {
   brakes: {
     id: 'brakes',
     demoLabel: 'Freios',
-    icon: Disc3,
+    icon: 'disc-outline',
     healthy: false,
     system: 'Sistema de frenagem',
     baselineScore: 87,
@@ -81,7 +74,7 @@ export const scenarios: Record<string, Scenario> = {
   battery: {
     id: 'battery',
     demoLabel: 'Bateria',
-    icon: BatteryWarning,
+    icon: 'battery-dead-outline',
     healthy: false,
     system: 'Bateria',
     baselineScore: 87,
@@ -116,7 +109,7 @@ export const scenarios: Record<string, Scenario> = {
   tires: {
     id: 'tires',
     demoLabel: 'Pneus',
-    icon: CircleDot,
+    icon: 'ellipse-outline',
     healthy: false,
     system: 'Pneus',
     baselineScore: 87,
@@ -151,7 +144,7 @@ export const scenarios: Record<string, Scenario> = {
   healthy: {
     id: 'healthy',
     demoLabel: 'Saúde normal',
-    icon: ShieldCheck,
+    icon: 'shield-checkmark-outline',
     healthy: true,
     system: 'Diagnóstico geral',
     baselineScore: 87,
