@@ -303,6 +303,8 @@ Ao final, o EAS mostra um link para baixar o `.apk`. O perfil `preview` do `eas.
 
 | Nome | RM |
 |---|---|
-| | |
-| | |
-| | |
+| Fabiano | 555524 |
+| Lorran | 558982 |
+| Maria | 557478 |
+| Pedro | 556268 |
+| Vinícius | 555200 |
